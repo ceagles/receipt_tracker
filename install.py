@@ -35,27 +35,37 @@ def main():
     # Check Python version
     check_python_version()
     
+    # Upgrade pip first (recommended for Windows)
+    print("🔄 Upgrading pip...")
+    run_command("python -m pip install --upgrade pip", "Upgrading pip")
+    
     # Install Python packages
     result = run_command("pip install -r requirements.txt", "Installing Python dependencies")
     if not result:
         print("❌ Failed to install Python packages")
+        print("💡 Try running manually: pip install -r requirements.txt")
         sys.exit(1)
     
     # Install playwright browsers
     result = run_command("playwright install chromium", "Installing Playwright Chromium browser")
     if not result:
         print("❌ Failed to install Playwright browsers")
+        print("💡 Try running manually: playwright install chromium")
         sys.exit(1)
     
     # Create necessary directories
     os.makedirs("downloads", exist_ok=True)
     os.makedirs("sessions", exist_ok=True)
+    os.makedirs("logs", exist_ok=True)
     print("✅ Created necessary directories")
     
     # Copy environment file if it doesn't exist
     if not os.path.exists(".env"):
         if os.path.exists(".env.example"):
-            run_command("cp .env.example .env", "Creating environment file")
+            # Use copy command for Windows compatibility
+            import shutil
+            shutil.copy(".env.example", ".env")
+            print("✅ Created .env file from template")
             print("📝 Please edit .env file with your Costco credentials")
         else:
             print("⚠️  .env.example not found, you'll need to create .env manually")
@@ -63,7 +73,8 @@ def main():
     print("\n🎉 Installation completed successfully!")
     print("\nNext steps:")
     print("1. Edit .env file with your Costco username and password")
-    print("2. Run: python main.py")
+    print("2. Run: python test_setup.py (to verify setup)")
+    print("3. Run: python main.py (to start scraping)")
 
 if __name__ == "__main__":
     main()
